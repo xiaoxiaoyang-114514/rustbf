@@ -11,12 +11,12 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>) -> Result<Vec<char>, String> 
     let mut output: Vec<char> = Vec::new();
     while line < src_bytes.len(){
         c = src_bytes[line];
-        if c == 62 {
+        if c == b'>' {
             index += 1;
             if index >= mem.len() {
                 mem.push(0);
             }
-        } else if c == 60 {
+        } else if c == b'<' {
             if index == 0{
                 return Err("the index is negative.".to_string());
             }
@@ -24,13 +24,13 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>) -> Result<Vec<char>, String> 
             if (mem[index+1] == 0) && (mem.len() == index + 2) {
                 mem.pop();
             }
-        } else if c == 43 {
+        } else if c == b'+' {
             mem[index] = mem[index].wrapping_add(1);
-        } else if c == 45 {
+        } else if c == b'-' {
             mem[index] = mem[index].wrapping_sub(1);
-        } else if c == 46 {
+        } else if c == b'.' {
             output.push(mem[index] as char);
-        } else if c == 44 {
+        } else if c == b',' {
             mem[index] = match input {
                 Some(ref list) => {
                     if input_index < list.len() {
@@ -45,7 +45,7 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>) -> Result<Vec<char>, String> 
                 },
             };
             input_index += 1;
-        } else if c == 91 {
+        } else if c == b'[' {
             if mem[index] == 0 {
                 let mut nesting = 1;
                 let tmpline = line;
@@ -61,7 +61,7 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>) -> Result<Vec<char>, String> 
                     }
                 }
             }
-        } else if c == 93 {
+        } else if c == b']' {
             if mem[index] != 0 {
                 let mut nesting = 1;
                 let tmpline = line;
