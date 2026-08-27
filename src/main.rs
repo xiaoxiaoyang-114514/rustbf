@@ -1,6 +1,5 @@
-use std::env;
+use std::{ env, fs };
 use rustbf::*;
-use std::fs;
 
 fn main() {
     let args: Vec<String> = env::args().collect();

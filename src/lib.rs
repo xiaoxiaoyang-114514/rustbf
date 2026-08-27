@@ -30,7 +30,7 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>, stream_opt: bool) -> Result<O
             mem[index] = mem[index].wrapping_sub(1);
         } else if c == b'.' {
             if stream_opt{
-                println!("{}", mem[index] as char);
+                print!("{}", mem[index] as char);
             }else{
                 output.push(mem[index] as char);
             }
