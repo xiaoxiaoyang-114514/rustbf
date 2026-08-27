@@ -1,6 +1,6 @@
 use std::io::Read;
 
-pub fn run_bf(src: &str, input: Option<Vec<char>>) -> Result<Vec<char>, String> {
+pub fn run_bf(src: &str, input: Option<Vec<char>>, stream_opt: bool) -> Result<Option<Vec<char>>, String> {
     let mut input_index = 0;
     let mut stdin_input = std::io::stdin().bytes();
     let src_bytes = src.as_bytes();
@@ -29,7 +29,11 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>) -> Result<Vec<char>, String> 
         } else if c == b'-' {
             mem[index] = mem[index].wrapping_sub(1);
         } else if c == b'.' {
-            output.push(mem[index] as char);
+            if stream_opt{
+                println!("{}", mem[index] as char);
+            }else{
+                output.push(mem[index] as char);
+            }
         } else if c == b',' {
             mem[index] = match input {
                 Some(ref list) => {
@@ -81,7 +85,11 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>) -> Result<Vec<char>, String> 
         line += 1;
     }
     output.push('\n');
-    Ok(output)
+    if stream_opt{
+        Ok(None)
+    } else {
+        Ok(Some(output))
+    }
 }
 
 
@@ -94,7 +102,7 @@ mod tests {
     #[test]
     fn hello_world() {
         let src = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
-        let out = run_bf(src, None).unwrap().into_iter().collect::<String>();
+        let out = run_bf(src, None, false).unwrap().unwrap().into_iter().collect::<String>();
         assert_eq!(out, "Hello World!\n\n");
     }
     
@@ -102,7 +110,7 @@ mod tests {
     fn double() {
         let src = ">,>[-]>[-]<<[->+>+<<]>.>.";
         let input: Vec<char> = ['a'].to_vec();
-        let out = run_bf(src, Some(input)).unwrap().into_iter().collect::<String>();
+        let out = run_bf(src, Some(input), false).unwrap().unwrap().into_iter().collect::<String>();
         assert_eq!(out, "aa\n");
     }
 }

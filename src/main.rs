@@ -20,9 +20,9 @@ fn main() {
         },
     };
     let output = if args.len() == 4 && args[2] == "--with-input" {
-        run_bf(&src, Some(parse_input(&args[3])))
+        run_bf(&src, Some(parse_input(&args[3])), true)
     } else if args.len() == 2 {
-        run_bf(&src, None)
+        run_bf(&src, None, true)
     } else if args.len() == 3 && args[2] == "--with-input" {
         eprintln!("Too few arguments. Expected 2 (--with-input <input>) but {}", args.len()-1);
         std::process::exit(1);
@@ -31,7 +31,7 @@ fn main() {
         std::process::exit(1);
     };
     match output {
-        Ok(a) => {
+        Ok(Some(a)) => {
             for i in a{
                 print!("{}",i);
             }
@@ -40,6 +40,7 @@ fn main() {
             eprintln!("{e}");
             std::process::exit(1);
         },
+        _ => {},
     }
 }
 

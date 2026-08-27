@@ -128,21 +128,23 @@ rustbf = { git = "https://github.com/xiaoxiaoyang-114514/rustbf" }
 
 
 ## lib.rs API 说明 (重要)
-```rust
-pub fn run_bf(src: &str, input: Option<Vec<char>>) -> Result<Vec<char>, String>
-```
+ ```rust
+ pub fn run_bf(src: &str, input: Option<Vec<char>>, stream_output: bool) -> Result<Option<Vec<char>>, String>
+ ```
 
 - 参数：
   - `src` - 包含 Brainfuck 源代码的字符串切片（解释器会忽略非 BF 指令字符）。
   - `input` - 可选输入，`Some(Vec<char>)` 时 `,` 指令从其中依次取字符；`None` 时从标准输入读取。
+  - `stream_output` - 是否直接输出。`true` 时 `.` 指令直接打印到 stdout；`false` 时收集后返回。
 - 返回值：
-  - `Ok(Vec<char>)` - 运行结束时产生的输出字符序列（函数会在末尾追加一个换行符 `\n`）。
+  - `Ok(Some(output))` - `stream_output` 为 false 时，运行结束时产生的输出字符序列（函数会在末尾追加一个换行符 `\n`）。
+  - `Ok(None)` - `stream_output` 为 true 时，直接输出至 stdout，返回 None。
   - `Err(String)` - 在出现错误时返回，并附带错误信息
 
 示例：把输出转换为字符串
 
 ```rust
-let out = run_bf(">+.+.", None).unwrap();
+let out = run_bf(">+.+.", None, false).unwrap().unwrap();
 let s: String = out.into_iter().collect();
 println!("输出: {}", s);
 ```
