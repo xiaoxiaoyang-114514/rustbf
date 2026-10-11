@@ -31,9 +31,7 @@ fn main() {
     };
     match output {
         Ok(Some(a)) => {
-            for i in a{
-                print!("{}",i);
-            }
+            print!("{a}");
         },
         Err(e) => {
             eprintln!("{e}");

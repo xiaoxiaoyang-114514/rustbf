@@ -1,6 +1,36 @@
 use std::io::Read;
 
-pub fn run_bf(src: &str, input: Option<Vec<char>>, stream_opt: bool) -> Result<Option<Vec<char>>, String> {
+pub fn parentheses_match(code: &[u8]) -> (Vec<usize>, Vec<usize>) {
+    let mut left: Vec<usize> = Vec::new();
+    let mut right: Vec<usize> = Vec::new();
+    let mut temp: Vec<usize> = Vec::new();
+    let mut out_left: Vec<usize> = Vec::new();
+    let mut out_right: Vec<usize> = Vec::new();
+    out_left.resize(code.len(), 0);
+    out_right.resize(code.len(), 0);
+    for i in 0..code.len() {
+        match code[i] {
+            b'[' => {
+                temp.push(i);
+            },
+            b']' => {
+                left.push(temp.pop().unwrap_or_else(|| {
+                    eprintln!("Parentheses could not match in {}.",i);
+                    std::process::exit(1);
+                }));
+                right.push(i)
+            },
+            _ => {},
+        }
+    }
+    for i in 0..left.len() {
+        out_left[left[i]] = right[i];
+        out_right[right[i]] = left[i];
+    }
+    (out_left, out_right)
+}
+
+pub fn run_bf(src: &str, input: Option<Vec<char>>, stream_opt: bool) -> Result<Option<String>, String> {
     let mut input_index = 0;
     let mut stdin_input = std::io::stdin().bytes();
     let src_bytes = src.as_bytes();
@@ -8,7 +38,9 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>, stream_opt: bool) -> Result<O
     let mut index = 0;
     let mut line: usize = 0;
     let mut c: u8;
-    let mut output: Vec<char> = Vec::new();
+    let mut output: String = String::new();
+    let (left, right) = parentheses_match(&src_bytes);
+    
     while line < src_bytes.len(){
         c = src_bytes[line];
         if c == b'>' {
@@ -31,7 +63,7 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>, stream_opt: bool) -> Result<O
         } else if c == b'.' {
             if stream_opt{
                 print!("{}", mem[index] as char);
-            }else{
+            } else{
                 output.push(mem[index] as char);
             }
         } else if c == b',' {
@@ -51,35 +83,11 @@ pub fn run_bf(src: &str, input: Option<Vec<char>>, stream_opt: bool) -> Result<O
             input_index += 1;
         } else if c == b'[' {
             if mem[index] == 0 {
-                let mut nesting = 1;
-                let tmpline = line;
-                while nesting > 0 {
-                    line += 1;
-                    if line >= src_bytes.len() {
-                        return Err(format!("Unexpected token \"[\" at the character {}. ", tmpline+1).to_string());
-                    }
-                    if src_bytes[line] == 91 {
-                        nesting += 1;
-                    } else if src_bytes[line] == 93 {
-                        nesting -= 1;
-                    }
-                }
+                line = left[line];
             }
         } else if c == b']' {
             if mem[index] != 0 {
-                let mut nesting = 1;
-                let tmpline = line;
-                while nesting > 0 {
-                    if line == 0 && nesting != 0{
-                        return Err(format!("Unexpected token \"]\" at the character {}.", tmpline+1).to_string());
-                    }
-                    line -= 1;
-                    if src_bytes[line] == 93 {
-                        nesting += 1;
-                    } else if src_bytes[line] == 91 {
-                        nesting -= 1;
-                    }
-                }
+                line = right[line];
             }
         }
         line += 1;
